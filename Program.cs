@@ -36,26 +36,7 @@ namespace delete68
 
 
         }
-
-        private static Bitmap LoadForFiltering(Bitmap bmp)
-        {
-          
-            if (bmp.PixelFormat == PixelFormat.Format24bppRgb)
-                return bmp;
-
-            try
-            {
-                // from AForge's sample code
-                if (bmp.PixelFormat == PixelFormat.Format16bppGrayScale || Bitmap.GetPixelFormatSize(bmp.PixelFormat) > 32)
-                    throw new NotSupportedException("Unsupported image format");
-
-                return AForge.Imaging.Image.Clone(bmp, PixelFormat.Format24bppRgb);
-            }
-            finally
-            {
-                bmp.Dispose();
-            }
-        }
+        
 
 
         private void DrawBitmapWithBorder(Bitmap bmp, Point pos, Graphics g)
