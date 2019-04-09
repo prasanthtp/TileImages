@@ -1,4 +1,4 @@
-﻿using AForge.Imaging.Filters;
+﻿ 
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,32 +11,43 @@ namespace delete68
     class Program
     {
         static void Main(string[] args)
-        { 
+        {
 
             var files = new string[] { @"C:\Temp\35_20.png", @"C:\Temp\35_25.png", @"C:\Temp\35_30.png", @"C:\Temp\40_20.png", @"C:\Temp\40_25.png", @"C:\Temp\40_30.png", @"C:\Temp\45_20.png", @"C:\Temp\45_25.png", @"C:\Temp\45_30.png" };
             string back = @"C:\Temp\back.png";
 
             Bitmap img = CombineBitmap(files, back);
-              Bitmap resized = new Bitmap(img, new Size(600, 600));
+            Bitmap resized = new Bitmap(img, new Size(600, 600));
             resized.Save(@"C:\temp\ORIGINAL.png");
 
-            Bitmap newImage = new Bitmap(600, 600);
-            using (Graphics gr = Graphics.FromImage(newImage))
-            {
-                gr.SmoothingMode = SmoothingMode.HighQuality;
-                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                gr.DrawImage(resized, new Rectangle(0, 0, 600, 600));
-            }
-            newImage.Save(@"C:\temp\ENHANDED.png");
+         
+
+            ImageCodecInfo jgpEncoder = GetEncoder(ImageFormat.Png);
+            Encoder myEncoder = Encoder.Quality;
+            EncoderParameters myEncoderParameters = new EncoderParameters(1);
+            EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 100L);
+            myEncoderParameters.Param[0] = myEncoderParameter;
 
 
-            img.Save(@"C:\Temp\final.png", ImageFormat.Png);
-
-
-
+            resized.Save(@"C:\Temp\ENHANDED.png", jgpEncoder, myEncoderParameters);
         }
+
+
         
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+            return null;
+        }
+
+
 
 
         private void DrawBitmapWithBorder(Bitmap bmp, Point pos, Graphics g)
