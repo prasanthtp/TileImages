@@ -1,6 +1,8 @@
-﻿using System;
+﻿using AForge.Imaging.Filters;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 
@@ -15,12 +17,46 @@ namespace delete68
             string back = @"C:\Temp\back.png";
 
             Bitmap img = CombineBitmap(files, back);
-         //   Bitmap resized = new Bitmap(img, new Size(962, 962));
+              Bitmap resized = new Bitmap(img, new Size(600, 600));
+            resized.Save(@"C:\temp\ORIGINAL.png");
+
+            Bitmap newImage = new Bitmap(600, 600);
+            using (Graphics gr = Graphics.FromImage(newImage))
+            {
+                gr.SmoothingMode = SmoothingMode.HighQuality;
+                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                gr.DrawImage(resized, new Rectangle(0, 0, 600, 600));
+            }
+            newImage.Save(@"C:\temp\ENHANDED.png");
+
+
             img.Save(@"C:\Temp\final.png", ImageFormat.Png);
 
 
 
         }
+
+        private static Bitmap LoadForFiltering(Bitmap bmp)
+        {
+          
+            if (bmp.PixelFormat == PixelFormat.Format24bppRgb)
+                return bmp;
+
+            try
+            {
+                // from AForge's sample code
+                if (bmp.PixelFormat == PixelFormat.Format16bppGrayScale || Bitmap.GetPixelFormatSize(bmp.PixelFormat) > 32)
+                    throw new NotSupportedException("Unsupported image format");
+
+                return AForge.Imaging.Image.Clone(bmp, PixelFormat.Format24bppRgb);
+            }
+            finally
+            {
+                bmp.Dispose();
+            }
+        }
+
 
         private void DrawBitmapWithBorder(Bitmap bmp, Point pos, Graphics g)
         {
